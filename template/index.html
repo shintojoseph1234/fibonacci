@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% block body %}
+      <main>
+         <section class="after-loop" style="padding-top: 10%;">
+            <div class="container">
+               <div class="row">
+                  <div class="col-lg-4 col-md-8 mb-5 mb-lg-0 mx-auto">
+                        <!-- form for posting the input data -->
+                       <form method="post" id="form_id">
+                         {% csrf_token %}
+                        <div class="form-group">
+                            <!-- label for the input field -->
+                           <label for="input">Enter a positive number:</label>
+                            <!-- input field which takes a number as Nth in fibonacci -->
+                           <!-- <input type="number" class="form-control" name="number" min="0" step="1" oninput="validity.valid||(value='');"> -->
+                           <input type="number" class="form-control" pattern="\d+"  name="number" min="0" step="1" oninput="validity.valid||(value='');">
+
+
+
+                        </div>
+                          <!-- submit button  -->
+                        <button type="button" class="btn btn-success" onclick="submit_from()" id="button_id">Submit</button>
+                     </form>
+
+                  </div>
+                  <div class="col-lg-4 col-md-8 mb-5 mb-lg-0 mx-auto">
+                     <a class="after-loop-item card border-0 card-snippets shadow-lg">
+                        <div class="card-body d-flex align-items-end flex-column text-right">
+                           <h4>Result</h4>
+                           <!-- result data after calculation-->
+                           <h4 id="result"></h4>
+                            <!-- result message after calculation -->
+                           <p class="w-75" id = "data_message"></p>
+                        </div>
+                     </a>
+                  </div>
+                  <div class="col-lg-4 col-md-8 mx-auto">
+                     <a class="after-loop-item card border-0 card-guides shadow-lg">
+                        <div class="card-body d-flex align-items-end flex-column text-right">
+                           <h4>Time</h4>
+                            <!-- time after calculation -->
+                           <h4 id="time"></h4>
+                            <!-- time message after calculation -->
+                           <p class="w-75" id = "time_message"></p>
+                        </div>
+                     </a>
+                  </div>
+               </div>
+            </div>
+         </section>
+      </main>
+
+    <!-- jquery script url -->
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <!-- javascript -->
+    <script type="text/javascript">
+
+      // form submit function
+      function submit_from() {
+            // obtain the form data
+             var formData = new FormData($('#form_id')[0]);
+             // ajax start
+             $.ajax({
+                    // post url
+                     url: "{% url 'calculate' %}",
+                     // method: POST
+                     type: 'POST',
+                     // form data
+                     data: formData,
+                     async: true,
+                     cache: false,
+                     contentType: false,
+                     processData: false,
+                     // ajax success response
+                     success: function(response_data) {
+                       // if calculation success
+                       if(response_data[0].status=='success')
+                       {
+                        // diaplay the result
+                         document.getElementById("result").innerHTML = response_data[0].data.result;
+                         // display the message
+                         document.getElementById("data_message").innerHTML = "is the element in the sequence";
+                         // display the time taken
+                         document.getElementById("time").innerHTML = response_data[0].data.time;
+                         // display the time taken message
+                         document.getElementById("time_message").innerHTML = "is the time taken";
+                       }
+                       // if calculation is failed
+                       else if (response_data[0].status=='failed')
+                       {
+                         // display the failure message
+                         document.getElementById("result").innerHTML = response_data[0].data.message;
+                       }
+                     }
+
+             }); // end of $.ajax
+      }
+
+      // function which submits form data on enter button click
+      $(function() {
+        // if keypress
+      	$("form input").keypress(function(e) {
+          // check whether key is enter key
+      		if ((e.which && e.which == 13) || (e.keyCode && e.keyCode == 13)) {
+            // click the button if enter key
+      			document.getElementById("button_id").click()
+      			return false;
+      		} else {
+      			return true;
+      		}
+      	});
+      });
+
+    </script>
+
+    {% endblock %}
